@@ -84,3 +84,44 @@ impl AirLabsRequest for AirlinesRequest {
         format!("{base}/airlines")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json as json;
+
+    use super::*;
+
+    const BODY: &str = r#"[{
+  "name": "American Airlines",
+  "iata_code": "AA",
+  "iata_prefix": 1,
+  "iata_accounting": 1,
+  "icao_code": "AAL",
+  "callsign": "AMERICAN",
+  "country_code": "US",
+  "iosa_registered": 1,
+  "is_scheduled": 1,
+  "is_passenger": 1,
+  "is_cargo": 1,
+  "is_international": 1,
+  "total_aircrafts": 684,
+  "average_fleet_age": 10,
+  "accidents_last_5y": 26,
+  "crashes_last_5y": 0,
+  "website": "www.aa.com",
+  "facebook": "facebook.com/aa",
+  "twitter": "twitter.com/americanair",
+  "instagram": "instagram.com/americanair",
+  "linkedin": "linkedin.com/company/american-airlines",
+  "slug": "american-aa-aal-us"
+}]
+"#;
+
+    #[test]
+    fn airlines() {
+        let airlines = json::from_str::<Vec<Airline>>(BODY).unwrap();
+        println!("{airlines:#?}");
+        assert_eq!(airlines.len(), 1);
+        assert_eq!(airlines[0].iata_code, "AA");
+    }
+}

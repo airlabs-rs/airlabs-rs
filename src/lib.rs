@@ -36,7 +36,7 @@ impl Client {
         Self { base, client, key }
     }
 
-    pub async fn airlines(&self) -> Result<api::Airline, Error> {
+    pub async fn airlines(&self) -> Result<Vec<api::Airline>, Error> {
         let request = api::AirlinesRequest::new(&self.key);
         self.get(request).await
     }
