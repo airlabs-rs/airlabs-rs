@@ -19,7 +19,7 @@ pub(crate) enum ApiResponse<T> {
 }
 
 impl<T> ApiResponse<T> {
-    pub fn into_result(self) -> Result<T, Error> {
+    pub(crate) fn into_result(self) -> Result<T, Error> {
         match self {
             Self::Success(success) => Ok(success),
             Self::Failure(error) => Err(Error::Failure(error)),
