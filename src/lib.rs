@@ -14,6 +14,8 @@
 #![warn(unused)]
 #![deny(warnings)]
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
 pub use error::Error;
@@ -38,6 +40,11 @@ impl Client {
 
     pub async fn airlines(&self) -> Result<Vec<api::Airline>, Error> {
         let request = api::AirlinesRequest::new(&self.key);
+        self.get(request).await
+    }
+
+    pub async fn airports(&self) -> Result<Vec<api::Airport>, Error> {
+        let request = api::AirportsRequest::new(&self.key);
         self.get(request).await
     }
 

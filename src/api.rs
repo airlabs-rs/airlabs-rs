@@ -2,9 +2,12 @@ use super::*;
 
 pub use airlines::Airline;
 pub use airlines::AirlinesRequest;
+pub use airports::Airport;
+pub use airports::AirportsRequest;
 pub use error::ErrorResponse;
 
 mod airlines;
+mod airports;
 mod error;
 
 fn default<T: Default>() -> T {
