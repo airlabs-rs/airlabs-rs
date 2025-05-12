@@ -49,7 +49,7 @@ impl Client {
         self.get(request).await
     }
 
-    pub async fn flight(&self, query: FlightQuery) -> Result<api::Flight, Error> {
+    pub async fn flight(&self, query: FlightQuery) -> Result<api::ResponseWrapper<api::Flight>, Error> {
         let request = api::FlightRequest::new(&self.key, query);
         self.get(request).await
     }

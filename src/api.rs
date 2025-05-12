@@ -19,6 +19,15 @@ fn default<T: Default>() -> T {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct ResponseRequestInfo {}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ResponseWrapper<T> {
+    request: ResponseRequestInfo,
+    response: T,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub(crate) enum ApiResponse<T> {
     Success(T),
