@@ -23,8 +23,8 @@ pub struct ResponseRequestInfo {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ResponseWrapper<T> {
-    request: ResponseRequestInfo,
-    response: T,
+    pub request: ResponseRequestInfo,
+    pub response: T,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
