@@ -2,6 +2,7 @@ use super::*;
 
 pub use airlines::Airline;
 pub use airlines::AirlinesRequest;
+pub use airlines::AirlinesRequestBuilder;
 pub use airports::Airport;
 pub use airports::AirportsRequest;
 pub use error::ErrorResponse;

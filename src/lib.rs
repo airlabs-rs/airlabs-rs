@@ -38,8 +38,8 @@ impl Client {
         Self { base, client, key }
     }
 
-    pub async fn airlines(&self) -> Result<Vec<api::Airline>, Error> {
-        let request = api::AirlinesRequest::new(&self.key);
+    pub async fn airlines(&self, request_builder: api::AirlinesRequestBuilder) -> Result<Vec<api::Airline>, Error> {
+        let request = request_builder.api_key(self.key).build();
         self.get(request).await
     }
 

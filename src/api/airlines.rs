@@ -1,5 +1,7 @@
 use super::*;
 
+use derive_builder::{Builder};
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Airline {
     /// Public name. Available in the Free plan.
@@ -48,7 +50,8 @@ pub struct Airline {
     pub slug: String,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize, Builder)]
+#[builder(public)]
 pub struct AirlinesRequest {
     pub api_key: String,
     #[serde(skip_serializing_if = "Option::is_none")]
