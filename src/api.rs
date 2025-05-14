@@ -5,13 +5,26 @@ pub use airlines::AirlinesRequest;
 pub use airports::Airport;
 pub use airports::AirportsRequest;
 pub use error::ErrorResponse;
+pub use flight::Flight;
+pub use flight::FlightQuery;
+pub use flight::FlightRequest;
 
 mod airlines;
 mod airports;
 mod error;
+mod flight;
 
 fn default<T: Default>() -> T {
     T::default()
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ResponseRequestInfo {}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ResponseWrapper<T> {
+    pub request: ResponseRequestInfo,
+    pub response: T,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

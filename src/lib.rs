@@ -16,6 +16,7 @@
 
 use std::collections::BTreeMap;
 
+use api::FlightQuery;
 use serde::{Deserialize, Serialize};
 
 pub use error::Error;
@@ -38,13 +39,18 @@ impl Client {
         Self { base, client, key }
     }
 
-    pub async fn airlines(&self) -> Result<Vec<api::Airline>, Error> {
+    pub async fn airlines(&self) -> Result<api::ResponseWrapper<Vec<api::Airline>>, Error> {
         let request = api::AirlinesRequest::new(&self.key);
         self.get(request).await
     }
 
-    pub async fn airports(&self) -> Result<Vec<api::Airport>, Error> {
+    pub async fn airports(&self) -> Result<api::ResponseWrapper<Vec<api::Airport>>, Error> {
         let request = api::AirportsRequest::new(&self.key);
+        self.get(request).await
+    }
+
+    pub async fn flight(&self, query: FlightQuery) -> Result<api::ResponseWrapper<api::Flight>, Error> {
+        let request = api::FlightRequest::new(&self.key, query);
         self.get(request).await
     }
 
