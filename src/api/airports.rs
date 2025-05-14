@@ -1,5 +1,7 @@
 use super::*;
 
+mod impls;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Airport {
     /// Public name. Available in the Free plan.
@@ -83,6 +85,7 @@ impl AirLabsRequest for AirportsRequest {
 
 #[cfg(test)]
 mod tests {
+    use codes_iso_639::part_1::LanguageCode;
     use serde_json as json;
 
     use super::*;
@@ -164,8 +167,21 @@ mod tests {
 "#;
     #[test]
     fn test_name() {
-        let airports = json::from_str::<Vec<Airport>>(BODY).unwrap();
+        let mut airports = json::from_str::<Vec<Airport>>(BODY).unwrap();
         assert_eq!(airports.len(), 1);
-        assert_eq!(airports[0].iata_code, "CDG");
+        let airport = airports.pop().unwrap();
+        assert_eq!(airport.iata_code, "CDG");
+        assert_eq!(
+            airport.name_by_language("fr"),
+            Some("Aéroport Paris–Charles de Gaulle")
+        );
+        assert_eq!(
+            airport.name_by_language(LanguageCode::El),
+            Some("Διεθνές Αεροδρόμιο Παρισιού Σαρλ ντε Γκωλ")
+        );
+        assert_eq!(
+            airport.name_by_language(LanguageCode::He),
+            Some("נמל התעופה שארל דה גול")
+        );
     }
 }
