@@ -54,7 +54,7 @@ pub struct Airport {
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct AirportsRequest {
-    pub api_key: String,
+    api_key: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub iata_code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,7 +69,7 @@ pub struct AirportsRequest {
 
 impl AirportsRequest {
     pub fn new(key: &str) -> Self {
-        let api_key = key.to_string();
+        let api_key = key.into();
         Self {
             api_key,
             ..default()
@@ -183,5 +183,13 @@ mod tests {
             airport.name_by_language(LanguageCode::He),
             Some("נמל התעופה שארל דה גול")
         );
+    }
+
+    #[test]
+    fn request_serde() {
+        let key = "secrettoken";
+        let request = AirportsRequest::new(key);
+        let text = json::to_string(&request).unwrap();
+        assert_eq!(text, r#"{"api_key":"secrettoken"}"#);
     }
 }

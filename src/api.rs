@@ -1,35 +1,57 @@
 use super::*;
 
 pub use airlines::Airline;
+pub use airlines::AirlineFree;
 pub use airlines::AirlinesRequest;
 pub use airports::Airport;
 pub use airports::AirportsRequest;
-pub use error::ErrorResponse;
+pub use error::Error;
+pub use request::ClientInfo;
+pub use request::ConnectionInfo;
+pub use request::Karma;
+pub use request::Key;
+pub use request::Params;
+pub use request::Request;
 
 mod airlines;
 mod airports;
 mod error;
+mod request;
 
 fn default<T: Default>() -> T {
     T::default()
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]
-pub(crate) enum ApiResponse<T> {
-    Success(T),
-    Failure(ErrorResponse),
+pub struct Response<T> {
+    pub request: Option<Request>,
+    #[serde(flatten)]
+    pub result: ApiResult<T>,
+    pub terms: Option<String>,
 }
 
-impl<T> ApiResponse<T> {
-    pub(crate) fn into_result(self) -> Result<T, Error> {
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ApiResult<T> {
+    Response(T),
+    Error(Error),
+}
+
+impl<T> Response<T> {
+    pub fn into_result(self) -> Result<T, Error> {
+        self.result.into_result()
+    }
+}
+
+impl<T> ApiResult<T> {
+    pub fn into_result(self) -> Result<T, Error> {
         match self {
-            Self::Success(success) => Ok(success),
-            Self::Failure(error) => Err(Error::Failure(error)),
+            Self::Response(value) => Ok(value),
+            Self::Error(error) => Err(error),
         }
     }
 }
 
-pub(crate) trait AirLabsRequest {
+pub(crate) trait AirLabsRequest: Sized {
     fn url(&self, base: &str) -> String;
 }

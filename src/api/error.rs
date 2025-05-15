@@ -1,13 +1,7 @@
 use super::*;
 
 #[derive(Debug, Serialize, Deserialize, thiserror::Error)]
-#[error("{error:#?}")]
-pub struct ErrorResponse {
-    pub error: Error,
-    pub terms: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[error("{message}")]
 pub struct Error {
     pub message: String,
     pub code: Code,

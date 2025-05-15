@@ -1,6 +1,16 @@
 use super::*;
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct AirlineFree {
+    /// Public name. Available in the Free plan.
+    pub name: String,
+    /// Official IATA code. Available in the Free plan.
+    pub iata_code: Option<String>,
+    /// Official ICAO code. Available in the Free plan.
+    pub icao_code: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Airline {
     /// Public name. Available in the Free plan.
     pub name: String,
@@ -9,9 +19,9 @@ pub struct Airline {
     /// 3 Numeric Accounting Code for Passenger Operations.
     pub iata_accounting: u64,
     /// Official IATA code. Available in the Free plan.
-    pub iata_code: String,
+    pub iata_code: Option<String>,
     /// Official ICAO code. Available in the Free plan.
-    pub icao_code: String,
+    pub icao_code: Option<String>,
     /// Allocated ICAO callsign.
     pub callsign: String,
     /// ISO 2 country code from Countries DB.
@@ -71,7 +81,7 @@ pub struct AirlinesRequest {
 
 impl AirlinesRequest {
     pub fn new(key: &str) -> Self {
-        let api_key = key.to_string();
+        let api_key = key.into();
         Self {
             api_key,
             ..default()
@@ -122,6 +132,6 @@ mod tests {
         let airlines = json::from_str::<Vec<Airline>>(BODY).unwrap();
         println!("{airlines:#?}");
         assert_eq!(airlines.len(), 1);
-        assert_eq!(airlines[0].iata_code, "AA");
+        assert_eq!(airlines[0].iata_code.as_deref(), Some("AA"));
     }
 }
