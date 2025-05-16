@@ -6,6 +6,9 @@ pub use airlines::AirlinesRequest;
 pub use airports::Airport;
 pub use airports::AirportsRequest;
 pub use error::Error;
+pub use flight::AircraftType;
+pub use flight::Flight;
+pub use flight::FlightFree;
 pub use request::ClientInfo;
 pub use request::ConnectionInfo;
 pub use request::Karma;
@@ -16,6 +19,7 @@ pub use request::Request;
 mod airlines;
 mod airports;
 mod error;
+mod flight;
 mod request;
 
 fn default<T: Default>() -> T {

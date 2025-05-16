@@ -32,7 +32,7 @@ pub struct Key {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
-    pub lang: String,
+    pub params: BTreeMap<String, String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
