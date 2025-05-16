@@ -10,7 +10,7 @@ pub struct Request {
     pub host: String,
     pub pid: u64,
     pub key: Key,
-    pub params: Params,
+    pub params: BTreeMap<String, String>,
     pub version: u64,
     pub method: String,
     pub client: ClientInfo,
@@ -58,9 +58,9 @@ pub struct GeoInfo {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ConnectionInfo {
-    pub r#type: String,
-    pub isp_code: u64,
-    pub isp_name: String,
+    pub r#type: Option<String>,
+    pub isp_code: Option<u64>,
+    pub isp_name: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

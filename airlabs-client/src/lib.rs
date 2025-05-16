@@ -1,8 +1,11 @@
 use airlabs_api as api;
+use serde_json as json;
 
 pub use error::Error;
+pub use response::Response;
 
 mod error;
+mod response;
 
 #[derive(Debug)]
 pub struct Client {
@@ -19,19 +22,24 @@ impl Client {
         Self { base, client, key }
     }
 
-    pub async fn airlines(&self) -> Result<Vec<api::Airline>, Error> {
+    pub async fn airlines_free(&self) -> reqwest::Result<Response<Vec<api::AirlineFree>>> {
         let request = api::AirlinesRequest::new(&self.key);
         self.get(request).await
     }
 
-    pub async fn airlines_free(&self) -> Result<Vec<api::AirlineFree>, Error> {
+    pub async fn airlines(&self) -> Result<Vec<api::Airline>, Error> {
         let request = api::AirlinesRequest::new(&self.key);
-        self.get(request).await
+        self.get_old(request).await
+    }
+
+    pub async fn airlines_free_old(&self) -> Result<Vec<api::AirlineFree>, Error> {
+        let request = api::AirlinesRequest::new(&self.key);
+        self.get_old(request).await
     }
 
     pub async fn airports(&self) -> Result<Vec<api::Airport>, Error> {
         let request = api::AirportsRequest::new(&self.key);
-        self.get(request).await
+        self.get_old(request).await
     }
 
     fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
@@ -42,7 +50,18 @@ impl Client {
         self.client.get(url).query(&request)
     }
 
-    async fn get<R, T>(&self, request: R) -> Result<T, Error>
+    async fn get<R, T>(&self, request: R) -> reqwest::Result<Response<T>>
+    where
+        R: api::AirLabsRequest + serde::Serialize,
+        T: for<'de> serde::Deserialize<'de>,
+    {
+        let request = self.get_request(request);
+        let raw = request.send().await?.error_for_status()?.text().await?;
+
+        Ok(Response::from_raw(raw))
+    }
+
+    async fn get_old<R, T>(&self, request: R) -> Result<T, Error>
     where
         R: api::AirLabsRequest + serde::Serialize,
         T: for<'de> serde::Deserialize<'de>,
