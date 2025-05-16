@@ -43,6 +43,10 @@ impl<T> Response<T> {
     pub fn into_result(self) -> Result<T, Error> {
         self.result.into_result()
     }
+
+    pub fn request(&self) -> Option<&Request> {
+        self.request.as_ref()
+    }
 }
 
 impl<T> ApiResult<T> {

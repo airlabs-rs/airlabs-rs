@@ -1,15 +1,52 @@
-use std::env;
-
+use airlabs_api as api;
 use airlabs_client::Client;
+// use airlabs_client::Error;
+use airlabs_client::Response;
+use clap::Args;
+use clap::Parser;
+use clap::Subcommand;
+use serde_json as json;
+
+use command::Command;
+use output::Output;
+use output::OutputParams;
+
+mod command;
+mod output;
+
+#[derive(Debug, Parser)]
+pub struct Cli {
+    #[command(flatten)]
+    params: OutputParams,
+
+    /// Airlabs API token
+    #[arg(long, global = true, env = "AIRLABS_API_TOKEN", hide_env_values = true)]
+    pub token: Option<String>,
+
+    #[command(subcommand)]
+    command: Command,
+}
+
+impl Cli {
+    async fn exec(self) -> anyhow::Result<()> {
+        let token = self.token.as_deref().unwrap_or_default();
+        let client = Client::new(token);
+        let response = self.command.exec(&client).await?;
+        if self.params.debug {
+            todo!("debug")
+        } else if self.params.raw {
+            println!("{}", response.raw());
+        } else if self.params.json {
+            println!("{}", response.json()?)
+        } else {
+            println!("{}", response.typed().unwrap())
+        }
+
+        Ok(())
+    }
+}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let token = env::var("AIRLABS_API_TOKEN")?;
-    let client = Client::new(token);
-    let airlines = client
-        .airlines_free()
-        .await
-        .inspect_err(|err| println!("{err:#?}"))?;
-    println!("{airlines:#?}");
-    Ok(())
+    Cli::parse().exec().await
 }
