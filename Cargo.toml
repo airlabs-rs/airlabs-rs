@@ -1,21 +1,50 @@
-[package]
-name = "airlabs"
+[workspace]
+resolver = "3"
+members = ["airlabs", "airlabs-api", "airlabs-client"]
+
+
+[workspace.package]
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+repository = "https://github.com/airlabs-rs/airlabs-rs"
 
 
-[dependencies]
-reqwest = { version = "0.12", features = ["json"] }
-serde = { version = "1.0", features = ["derive"] }
-thiserror = "2.0"
-
-
-[dev-dependencies]
+[workspace.dependencies]
 anyhow = "1.0"
 codes-iso-639 = "0.1"
-tokio = { version = "1.41", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+thiserror = "2.0"
+tokio = { version = "1.41", features = ["full"] }
 
 
-[features]
-pedantic = []
+airlabs-api = { path = "./airlabs-api" }
+airlabs-client = { path = "./airlabs-client" }
+
+
+[workspace.lints.clippy]
+use_self = "warn"
+map_flatten = "warn"
+map_unwrap_or = "warn"
+large_futures = "warn"
+
+
+[workspace.lints.rust]
+deprecated_in_future = "warn"
+future_incompatible = "warn"
+# non_exhaustive_omitted_patterns = "warn"
+noop_method_call = "warn"
+unreachable_pub = "warn"
+missing_debug_implementations = "warn"
+rust_2018_compatibility = "warn"
+rust_2021_compatibility = "warn"
+rust_2024_compatibility = "warn"
+rust_2018_idioms = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused = "warn"
+unused_crate_dependencies = "warn"
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+warnings = "deny"
