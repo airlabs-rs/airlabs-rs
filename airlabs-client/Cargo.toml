@@ -1,0 +1,16 @@
+[package]
+name = "airlabs-client"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+
+[dependencies]
+airlabs-api.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+
+[lints]
+workspace = true

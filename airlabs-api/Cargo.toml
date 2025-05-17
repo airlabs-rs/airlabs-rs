@@ -1,0 +1,19 @@
+[package]
+name = "airlabs-api"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+
+
+[dev-dependencies]
+serde_json.workspace = true
+codes-iso-639.workspace = true
+
+
+[lints]
+workspace = true

@@ -1,0 +1,16 @@
+[package]
+name = "airlabs"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+
+[dependencies]
+anyhow.workspace = true
+tokio.workspace = true
+
+airlabs-client.workspace = true
+
+
+[lints]
+workspace = true

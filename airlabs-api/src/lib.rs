@@ -1,4 +1,6 @@
-use super::*;
+use std::collections::BTreeMap;
+
+use serde::{Deserialize, Serialize};
 
 pub use airlines::Airline;
 pub use airlines::AirlineFree;
@@ -21,10 +23,6 @@ mod airports;
 mod error;
 mod flight;
 mod request;
-
-fn default<T: Default>() -> T {
-    T::default()
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Response<T> {
@@ -56,6 +54,10 @@ impl<T> ApiResult<T> {
     }
 }
 
-pub(crate) trait AirLabsRequest: Sized {
+pub trait AirLabsRequest: Sized {
     fn url(&self, base: &str) -> String;
+}
+
+fn default<T: Default>() -> T {
+    T::default()
 }
