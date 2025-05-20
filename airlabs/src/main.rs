@@ -31,18 +31,7 @@ impl Cli {
     async fn exec(self) -> anyhow::Result<()> {
         let token = self.token.as_deref().unwrap_or_default();
         let client = Client::new(token);
-        let response = self.command.exec(&client).await?;
-        if self.params.debug {
-            todo!("debug")
-        } else if self.params.raw {
-            println!("{}", response.raw());
-        } else if self.params.json {
-            println!("{}", response.json()?)
-        } else {
-            println!("{}", response.typed().unwrap())
-        }
-
-        Ok(())
+        self.command.exec(&client, &self.params).await
     }
 }
 

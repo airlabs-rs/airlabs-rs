@@ -1,18 +1,10 @@
 use super::*;
 
 impl Output for api::AirlineFree {
-    fn raw(&self) -> String {
-        format!("{self:?}")
-    }
-
-    fn json(&self) -> serde_json::Result<serde_json::Value> {
-        json::to_value(self)
-    }
-
-    fn typed(&self) -> json::Result<String> {
-        Ok(format!(
-            "Name: {}\nIATA: {:?}\nICAO: {:?}",
+    fn output(&self) -> String {
+        format!(
+            "Name: {}\n IATA: {:?}\n ICAO: {:?}",
             self.name, self.iata_code, self.icao_code
-        ))
+        )
     }
 }
