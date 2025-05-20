@@ -1,8 +1,11 @@
+use std::time;
+
 use airlabs_api as api;
 use serde_json as json;
 
 pub use error::Error;
 pub use response::Response;
+pub use response::TypedResponse;
 
 mod error;
 mod response;
@@ -22,7 +25,7 @@ impl Client {
         Self { base, client, key }
     }
 
-    pub async fn airlines_free(&self) -> reqwest::Result<Response<Vec<api::AirlineFree>>> {
+    pub async fn airlines_free(&self) -> reqwest::Result<Response> {
         let request = api::AirlinesRequest::new(&self.key);
         self.get(request).await
     }
@@ -50,15 +53,27 @@ impl Client {
         self.client.get(url).query(&request)
     }
 
-    async fn get<R, T>(&self, request: R) -> reqwest::Result<Response<T>>
+    pub async fn get<R>(&self, request: R) -> reqwest::Result<Response>
+    where
+        R: api::AirLabsRequest + serde::Serialize,
+    {
+        let start = time::Instant::now();
+        let request = self.get_request(request);
+        request
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await
+            .map(|raw| Response::new(raw, start.elapsed()))
+    }
+
+    async fn _get_typed<R, T>(&self, request: R) -> reqwest::Result<TypedResponse<T>>
     where
         R: api::AirLabsRequest + serde::Serialize,
         T: for<'de> serde::Deserialize<'de>,
     {
-        let request = self.get_request(request);
-        let raw = request.send().await?.error_for_status()?.text().await?;
-
-        Ok(Response::from_raw(raw))
+        self.get(request).await.map(TypedResponse::from_response)
     }
 
     async fn get_old<R, T>(&self, request: R) -> Result<T, Error>

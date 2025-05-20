@@ -1,5 +1,7 @@
 use super::*;
 
+mod impls;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Request {
     pub lang: String,

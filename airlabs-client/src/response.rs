@@ -1,20 +1,22 @@
 use std::marker::PhantomData;
+use std::time;
 
 use super::*;
 
 #[derive(Clone, Debug)]
-pub struct Response<T> {
+pub struct Response {
+    duration: time::Duration,
     raw: String,
-    phantom: PhantomData<T>,
 }
 
-impl<T> Response<T>
-where
-    T: serde::de::DeserializeOwned,
-{
-    pub fn from_raw(raw: String) -> Self {
-        let phantom = PhantomData;
-        Self { raw, phantom }
+impl Response {
+    pub fn new(raw: impl ToString, duration: time::Duration) -> Self {
+        let raw = raw.to_string();
+        Self { duration, raw }
+    }
+
+    pub fn duration(&self) -> time::Duration {
+        self.duration
     }
 
     pub fn raw(&self) -> &str {
@@ -25,14 +27,52 @@ where
         json::from_str(&self.raw)
     }
 
-    pub fn typed(&self) -> json::Result<T>
+    pub fn typed<T>(&self) -> json::Result<T>
     where
         T: serde::de::DeserializeOwned,
     {
-        json::from_str(&self.raw)
+        self.json().and_then(json::from_value)
+    }
+
+    pub fn api_response<T>(&self) -> json::Result<api::Response<T>>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        self.typed()
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct TypedResponse<T> {
+    response: Response,
+    phantom: PhantomData<T>,
+}
+
+impl<T> TypedResponse<T>
+where
+    T: serde::de::DeserializeOwned,
+{
+    pub fn from_response(response: Response) -> Self {
+        let phantom = PhantomData;
+        Self { response, phantom }
     }
 
     pub fn response(&self) -> json::Result<api::Response<T>> {
-        json::from_str(&self.raw)
+        self.response.typed()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const AIRLINES_RESPONSE: &str = include_str!("airlines.json");
+    #[test]
+    fn test_name() {
+        let now = time::Instant::now();
+        let response = Response::new(AIRLINES_RESPONSE, now.elapsed());
+        let response = response.api_response::<Vec<api::AirlineFree>>().unwrap();
+        let airlines = response.into_result().unwrap();
+        assert_eq!(airlines.len(), 6500);
     }
 }

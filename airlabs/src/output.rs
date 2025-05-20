@@ -1,40 +1,37 @@
+use itertools::Itertools;
+
 use super::*;
 
 mod airline;
 
 #[derive(Debug, Args)]
 pub(crate) struct OutputParams {
+    /// Enable debug output
     #[arg(short, long, global = true)]
     pub debug: bool,
+
+    /// Output raw API response
     #[arg(short, long, global = true)]
     pub raw: bool,
+
+    /// Output API response as JSON
     #[arg(short, long, global = true)]
     pub json: bool,
+
+    /// Also show API call stats
+    #[arg(short, long, global = true)]
+    pub stats: bool,
 }
 
 pub(crate) trait Output {
-    fn raw(&self) -> String;
-    fn json(&self) -> json::Result<json::Value>;
-    fn typed(&self) -> json::Result<String>;
+    fn output(&self) -> String;
 }
 
-impl<T> Output for Response<T>
+impl<T> Output for Vec<T>
 where
-    T: serde::de::DeserializeOwned + std::fmt::Debug,
+    T: Output,
 {
-    fn raw(&self) -> String {
-        self.raw().to_string()
-    }
-
-    fn json(&self) -> json::Result<json::Value> {
-        self.json()
-    }
-
-    fn typed(&self) -> json::Result<String> {
-        let text = match self.response()?.into_result() {
-            Ok(typed) => format!("{typed:?}"),
-            Err(error) => error.message,
-        };
-        Ok(text)
+    fn output(&self) -> String {
+        self.iter().map(|item| item.output()).join("\n")
     }
 }
