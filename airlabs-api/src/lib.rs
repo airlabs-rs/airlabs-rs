@@ -11,6 +11,8 @@ pub use error::Error;
 pub use flight::AircraftType;
 pub use flight::Flight;
 pub use flight::FlightFree;
+pub use ping::PingRequest;
+pub use ping::Pong;
 pub use request::ClientInfo;
 pub use request::ConnectionInfo;
 pub use request::Karma;
@@ -22,6 +24,7 @@ mod airlines;
 mod airports;
 mod error;
 mod flight;
+mod ping;
 mod request;
 
 #[derive(Debug, Serialize, Deserialize)]

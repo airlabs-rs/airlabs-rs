@@ -35,3 +35,9 @@ where
         self.iter().map(|item| item.output()).join("\n")
     }
 }
+
+impl Output for api::Pong {
+    fn output(&self) -> String {
+        format!("{self:?}")
+    }
+}
