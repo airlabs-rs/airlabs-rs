@@ -4,6 +4,9 @@ use super::*;
 pub(super) enum Command {
     #[command(visible_alias = "airlines")]
     Airline,
+
+    /// Ping API server
+    Ping,
 }
 
 impl Command {
@@ -12,6 +15,10 @@ impl Command {
             Self::Airline => {
                 let response = client.airlines_free().await?;
                 self.show::<Vec<api::AirlineFree>>(response, params)?;
+            }
+            Self::Ping => {
+                let response = client.ping().await?;
+                self.show::<api::Pong>(response, params)?;
             }
         }
         Ok(())
@@ -36,7 +43,12 @@ impl Command {
         }
 
         if params.stats {
-            println!("API call took {:?}", response.duration());
+            let duration = response.duration();
+            let response = response.api_response::<T>()?;
+            if let Some(request) = response.request {
+                println!("{request:#?}");
+            }
+            println!("API call took {duration:?}");
         }
 
         Ok(())

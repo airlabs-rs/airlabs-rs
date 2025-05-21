@@ -25,6 +25,13 @@ impl Client {
         Self { base, client, key }
     }
 
+    pub async fn ping(&self) -> reqwest::Result<Response> {
+        let request = api::PingRequest {
+            api_key: self.key.clone(),
+        };
+        self.post(request).await
+    }
+
     pub async fn airlines_free(&self) -> reqwest::Result<Response> {
         let request = api::AirlinesRequest::new(&self.key);
         self.get(request).await
@@ -59,6 +66,29 @@ impl Client {
     {
         let start = time::Instant::now();
         let request = self.get_request(request);
+        request
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await
+            .map(|raw| Response::new(raw, start.elapsed()))
+    }
+
+    fn post_request<R>(&self, request: R) -> reqwest::RequestBuilder
+    where
+        R: api::AirLabsRequest + serde::Serialize,
+    {
+        let url = self.url(&request);
+        self.client.post(url).json(&request)
+    }
+
+    pub async fn post<R>(&self, request: R) -> reqwest::Result<Response>
+    where
+        R: api::AirLabsRequest + serde::Serialize,
+    {
+        let start = time::Instant::now();
+        let request = self.post_request(request);
         request
             .send()
             .await?
