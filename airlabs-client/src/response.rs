@@ -63,16 +63,4 @@ where
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    const AIRLINES_RESPONSE: &str = include_str!("airlines.json");
-    #[test]
-    fn test_name() {
-        let now = time::Instant::now();
-        let response = Response::new(AIRLINES_RESPONSE, now.elapsed());
-        let response = response.api_response::<Vec<api::AirlineFree>>().unwrap();
-        let airlines = response.into_result().unwrap();
-        assert_eq!(airlines.len(), 6500);
-    }
-}
+mod tests;

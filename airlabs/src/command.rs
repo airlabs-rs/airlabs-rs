@@ -2,8 +2,13 @@ use super::*;
 
 #[derive(Clone, Debug, Subcommand)]
 pub(super) enum Command {
+    /// Get airline list
     #[command(visible_alias = "airlines")]
     Airline,
+
+    /// Get airport list
+    #[command(visible_alias = "airports")]
+    Airport,
 
     /// Ping API server
     Ping,
@@ -20,6 +25,16 @@ impl Command {
                     self.show::<Vec<api::Airline>>(response, params)?;
                 }
             }
+
+            Self::Airport => {
+                let response = client.airports().await?;
+                if client.is_free() {
+                    self.show::<Vec<api::AirportFree>>(response, params)?;
+                } else {
+                    self.show::<Vec<api::Airport>>(response, params)?;
+                }
+            }
+
             Self::Ping => {
                 let response = client.ping().await?;
                 self.show::<api::Pong>(response, params)?;
