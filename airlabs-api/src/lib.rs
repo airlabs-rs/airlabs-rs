@@ -12,6 +12,8 @@ pub use error::Error;
 pub use flight::AircraftType;
 pub use flight::Flight;
 pub use flight::FlightFree;
+pub use flight::FlightRequest;
+pub use flight::FlightRequestParam;
 pub use ping::PingRequest;
 pub use ping::Pong;
 pub use request::ClientInfo;
