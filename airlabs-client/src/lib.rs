@@ -64,6 +64,15 @@ impl Client {
         self.get(request).await
     }
 
+    pub async fn flights(&self, params: api::FlightRequestParam) -> reqwest::Result<Response> {
+        let mut request = api::FlightRequest::new(&self.key);
+        match params {
+            api::FlightRequestParam::Icao(code) => request.flight_icao = Some(code),
+            api::FlightRequestParam::Iata(code) => request.flight_iata = Some(code),
+        }
+        self.get(request).await
+    }
+
     fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
     where
         R: api::AirLabsRequest + serde::Serialize,

@@ -306,5 +306,36 @@ pub enum AircraftType {
     Amphibian,
 }
 
+#[derive(Debug)]
+pub enum FlightRequestParam {
+    Icao(String),
+    Iata(String)
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct FlightRequest {
+    api_key: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flight_icao: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flight_iata: Option<String>,
+}
+
+impl FlightRequest {
+    pub fn new(key: &str) -> Self {
+        let api_key = key.into();
+        Self {
+            api_key,
+            ..default()
+        }
+    }
+}
+
+impl AirLabsRequest for FlightRequest {
+    fn url(&self, base: &str) -> String {
+        format!("{base}/flights")
+    }
+}
+
 #[cfg(test)]
 mod tests;
