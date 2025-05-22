@@ -13,8 +13,12 @@ impl Command {
     pub(super) async fn exec(self, client: &Client, params: &OutputParams) -> anyhow::Result<()> {
         match self {
             Self::Airline => {
-                let response = client.airlines_free().await?;
-                self.show::<Vec<api::AirlineFree>>(response, params)?;
+                let response = client.airlines().await?;
+                if client.is_free() {
+                    self.show::<Vec<api::AirlineFree>>(response, params)?;
+                } else {
+                    self.show::<Vec<api::Airline>>(response, params)?;
+                }
             }
             Self::Ping => {
                 let response = client.ping().await?;

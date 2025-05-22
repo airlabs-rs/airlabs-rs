@@ -15,6 +15,7 @@ pub struct Client {
     base: String,
     client: reqwest::Client,
     key: String,
+    free_account: bool,
 }
 
 impl Client {
@@ -22,7 +23,28 @@ impl Client {
         let base = "https://airlabs.co/api/v9".to_string();
         let key = key.to_string();
         let client = reqwest::Client::new();
-        Self { base, client, key }
+        let free_account = false;
+        Self {
+            base,
+            client,
+            key,
+            free_account,
+        }
+    }
+
+    pub fn update_from_ping(self, ping: Response) -> json::Result<Self> {
+        let free_account = ping
+            .api_response::<api::Pong>()?
+            .request
+            .is_some_and(|request| request.is_free());
+        Ok(Self {
+            free_account,
+            ..self
+        })
+    }
+
+    pub fn is_free(&self) -> bool {
+        self.free_account
     }
 
     pub async fn ping(&self) -> reqwest::Result<Response> {
@@ -32,14 +54,9 @@ impl Client {
         self.post(request).await
     }
 
-    pub async fn airlines_free(&self) -> reqwest::Result<Response> {
+    pub async fn airlines(&self) -> reqwest::Result<Response> {
         let request = api::AirlinesRequest::new(&self.key);
         self.get(request).await
-    }
-
-    pub async fn airlines(&self) -> Result<Vec<api::Airline>, Error> {
-        let request = api::AirlinesRequest::new(&self.key);
-        self.get_old(request).await
     }
 
     pub async fn airlines_free_old(&self) -> Result<Vec<api::AirlineFree>, Error> {
