@@ -6,6 +6,7 @@ pub use airlines::Airline;
 pub use airlines::AirlineFree;
 pub use airlines::AirlinesRequest;
 pub use airports::Airport;
+pub use airports::AirportFree;
 pub use airports::AirportsRequest;
 pub use error::Error;
 pub use flight::AircraftType;

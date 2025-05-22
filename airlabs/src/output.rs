@@ -3,6 +3,7 @@ use itertools::Itertools;
 use super::*;
 
 mod airline;
+mod airport;
 
 #[derive(Debug, Args)]
 pub(crate) struct OutputParams {

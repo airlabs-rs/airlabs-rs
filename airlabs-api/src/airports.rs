@@ -3,13 +3,29 @@ use super::*;
 mod impls;
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct AirportFree {
+    /// Public name. Available in the Free plan.
+    pub name: String,
+    /// Official IATA code. Available in the Free plan.
+    pub iata_code: Option<String>,
+    /// Official ICAO code. Available in the Free plan.
+    pub icao_code: Option<String>,
+    /// Geo Latitude. Available in the Free plan.
+    pub lat: f64,
+    /// Geo Longitude. Available in the Free plan.
+    pub lng: f64,
+    /// ISO 2 country code from Countries DB. Available in the Free plan.
+    pub country_code: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Airport {
     /// Public name. Available in the Free plan.
     pub name: String,
     /// Official IATA code. Available in the Free plan.
-    pub iata_code: String,
+    pub iata_code: Option<String>,
     /// Official ICAO code. Available in the Free plan.
-    pub icao_code: String,
+    pub icao_code: Option<String>,
     /// Geo Latitude. Available in the Free plan.
     pub lat: f64,
     /// Geo Longitude. Available in the Free plan.
@@ -170,7 +186,7 @@ mod tests {
         let mut airports = json::from_str::<Vec<Airport>>(BODY).unwrap();
         assert_eq!(airports.len(), 1);
         let airport = airports.pop().unwrap();
-        assert_eq!(airport.iata_code, "CDG");
+        assert_eq!(airport.iata_code.as_deref(), Some("CDG"));
         assert_eq!(
             airport.name_by_language("fr"),
             Some("Aéroport Paris–Charles de Gaulle")
