@@ -59,14 +59,9 @@ impl Client {
         self.get(request).await
     }
 
-    pub async fn airlines_free_old(&self) -> Result<Vec<api::AirlineFree>, Error> {
-        let request = api::AirlinesRequest::new(&self.key);
-        self.get_old(request).await
-    }
-
-    pub async fn airports(&self) -> Result<Vec<api::Airport>, Error> {
+    pub async fn airports(&self) -> reqwest::Result<Response> {
         let request = api::AirportsRequest::new(&self.key);
-        self.get_old(request).await
+        self.get(request).await
     }
 
     fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
@@ -77,7 +72,7 @@ impl Client {
         self.client.get(url).query(&request)
     }
 
-    pub async fn get<R>(&self, request: R) -> reqwest::Result<Response>
+    async fn get<R>(&self, request: R) -> reqwest::Result<Response>
     where
         R: api::AirLabsRequest + serde::Serialize,
     {
@@ -100,7 +95,7 @@ impl Client {
         self.client.post(url).json(&request)
     }
 
-    pub async fn post<R>(&self, request: R) -> reqwest::Result<Response>
+    async fn post<R>(&self, request: R) -> reqwest::Result<Response>
     where
         R: api::AirLabsRequest + serde::Serialize,
     {
@@ -113,30 +108,6 @@ impl Client {
             .text()
             .await
             .map(|raw| Response::new(raw, start.elapsed()))
-    }
-
-    async fn _get_typed<R, T>(&self, request: R) -> reqwest::Result<TypedResponse<T>>
-    where
-        R: api::AirLabsRequest + serde::Serialize,
-        T: for<'de> serde::Deserialize<'de>,
-    {
-        self.get(request).await.map(TypedResponse::from_response)
-    }
-
-    async fn get_old<R, T>(&self, request: R) -> Result<T, Error>
-    where
-        R: api::AirLabsRequest + serde::Serialize,
-        T: for<'de> serde::Deserialize<'de>,
-    {
-        let request = self.get_request(request);
-        let response = request
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<api::Response<T>>()
-            .await?
-            .into_result()?;
-        Ok(response)
     }
 
     fn url<T>(&self, request: &T) -> String
