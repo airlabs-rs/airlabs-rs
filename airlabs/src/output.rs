@@ -4,6 +4,7 @@ use super::*;
 
 mod airline;
 mod airport;
+mod flight;
 
 #[derive(Debug, Args)]
 pub(crate) struct OutputParams {
