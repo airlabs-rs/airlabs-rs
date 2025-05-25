@@ -10,8 +10,23 @@ pub(super) enum Command {
     #[command(visible_alias = "airports")]
     Airport,
 
+    /// Get flight information
+    Flight(Flight),
+
     /// Ping API server
     Ping,
+}
+
+#[derive(Clone, Debug, Args)]
+#[group(required = true, multiple = false)]
+pub(super) struct Flight {
+    /// IATA flight code
+    #[arg(long)]
+    iata: Option<String>,
+
+    /// ICAO flight code
+    #[arg(long)]
+    icao: Option<String>,
 }
 
 impl Command {
@@ -35,6 +50,20 @@ impl Command {
                 }
             }
 
+            Self::Flight(ref flight) => {
+                let response = if let Some(code) = flight.iata.as_ref() {
+                    client.flight_iata(code).await?
+                } else if let Some(code) = flight.icao.as_ref() {
+                    client.flight_icao(code).await?
+                } else {
+                    unreachable!()
+                };
+                if client.is_free() {
+                    self.show::<api::FlightFree>(response, params)?;
+                } else {
+                    self.show::<api::Flight>(response, params)?;
+                }
+            }
             Self::Ping => {
                 let response = client.ping().await?;
                 self.show::<api::Pong>(response, params)?;

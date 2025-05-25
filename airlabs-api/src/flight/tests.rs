@@ -29,3 +29,17 @@ fn ek96_free() {
     println!("{flight:#?}");
     assert_eq!(flight.r#type, Some(AircraftType::Adsb));
 }
+
+#[test]
+fn flight_iata() {
+    let req = FlightRequest::iata("secret", "KL1606");
+    let req = json::to_string(&req).unwrap();
+    assert_eq!(req, r#"{"api_key":"secret","flight_iata":"KL1606"}"#);
+}
+
+#[test]
+fn flight_icao() {
+    let req = FlightRequest::icao("secret", "KLM1606");
+    let req = json::to_string(&req).unwrap();
+    assert_eq!(req, r#"{"api_key":"secret","flight_icao":"KLM1606"}"#);
+}

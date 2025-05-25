@@ -1,5 +1,7 @@
 use super::*;
 
+mod impls;
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FlightFree {
@@ -304,6 +306,27 @@ pub enum AircraftType {
     Helicopter,
     Gyrocopter,
     Amphibian,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct FlightRequest {
+    api_key: String,
+    #[serde(flatten)]
+    pub code: FlightCode,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum FlightCode {
+    #[serde(rename = "flight_iata")]
+    Iata(String),
+    #[serde(rename = "flight_icao")]
+    Icao(String),
+}
+
+impl AirLabsRequest for FlightRequest {
+    fn url(&self, base: &str) -> String {
+        format!("{base}/flight")
+    }
 }
 
 #[cfg(test)]

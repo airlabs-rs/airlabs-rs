@@ -64,6 +64,16 @@ impl Client {
         self.get(request).await
     }
 
+    pub async fn flight_iata(&self, code: impl ToString) -> reqwest::Result<Response> {
+        let request = api::FlightRequest::iata(&self.key, code);
+        self.get(request).await
+    }
+
+    pub async fn flight_icao(&self, code: impl ToString) -> reqwest::Result<Response> {
+        let request = api::FlightRequest::icao(&self.key, code);
+        self.get(request).await
+    }
+
     fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
     where
         R: api::AirLabsRequest + serde::Serialize,
