@@ -12,6 +12,9 @@ pub struct PingRequest {
 }
 
 impl AirLabsRequest for PingRequest {
+    type Response = Pong;
+    type ResponseFree = Pong;
+
     fn url(&self, base: &str) -> String {
         format!("{base}/ping")
     }

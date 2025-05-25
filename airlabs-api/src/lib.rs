@@ -65,6 +65,9 @@ impl<T> ApiResult<T> {
 }
 
 pub trait AirLabsRequest: Sized {
+    type Response;
+    type ResponseFree;
+
     fn url(&self, base: &str) -> String;
 }
 
