@@ -94,6 +94,9 @@ impl AirportsRequest {
 }
 
 impl AirLabsRequest for AirportsRequest {
+    type Response = Vec<Airport>;
+    type ResponseFree = Vec<AirportFree>;
+
     fn url(&self, base: &str) -> String {
         format!("{base}/airports")
     }
