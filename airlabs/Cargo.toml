@@ -1,8 +1,13 @@
 [package]
 name = "airlabs"
+description = "airlabs CLI utility"
+
 version.workspace = true
 edition.workspace = true
 repository.workspace = true
+authors.workspace = true
+license.workspace = true
+readme.workspace = true
 
 
 [dependencies]
