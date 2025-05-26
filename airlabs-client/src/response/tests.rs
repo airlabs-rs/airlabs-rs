@@ -29,4 +29,5 @@ fn flight_free() {
     let response = response.api_response::<api::FlightFree>().unwrap();
     let flight = response.into_result().unwrap();
     assert_eq!(flight.aircraft_icao, None);
+    assert_eq!(flight.airline_name.as_deref(), Some("Singapore Airlines"));
 }
