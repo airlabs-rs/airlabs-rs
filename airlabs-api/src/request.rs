@@ -23,8 +23,10 @@ pub struct Key {
     pub id: u64,
     pub api_key: String,
     pub r#type: String,
-    pub expired: String,
-    pub registered: String,
+    #[serde(with = "time::serde::rfc3339")]
+    pub expired: time::OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub registered: time::OffsetDateTime,
     pub upgraded: Option<String>,
     pub limits_by_hour: u64,
     pub limits_by_minute: u64,
