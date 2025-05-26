@@ -74,15 +74,7 @@ impl Client {
         self.get(request).await
     }
 
-    fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
-    where
-        R: api::AirLabsRequest + serde::Serialize,
-    {
-        let url = self.url(&request);
-        self.client.get(url).query(&request)
-    }
-
-    async fn get<R>(&self, request: R) -> reqwest::Result<Response>
+    pub async fn get<R>(&self, request: R) -> reqwest::Result<Response>
     where
         R: api::AirLabsRequest + serde::Serialize,
     {
@@ -95,14 +87,6 @@ impl Client {
             .text()
             .await
             .map(|raw| Response::new(raw, start.elapsed()))
-    }
-
-    fn post_request<R>(&self, request: R) -> reqwest::RequestBuilder
-    where
-        R: api::AirLabsRequest + serde::Serialize,
-    {
-        let url = self.url(&request);
-        self.client.post(url).json(&request)
     }
 
     async fn post<R>(&self, request: R) -> reqwest::Result<Response>
@@ -118,6 +102,22 @@ impl Client {
             .text()
             .await
             .map(|raw| Response::new(raw, start.elapsed()))
+    }
+
+    fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
+    where
+        R: api::AirLabsRequest + serde::Serialize,
+    {
+        let url = self.url(&request);
+        self.client.get(url).query(&request)
+    }
+
+    fn post_request<R>(&self, request: R) -> reqwest::RequestBuilder
+    where
+        R: api::AirLabsRequest + serde::Serialize,
+    {
+        let url = self.url(&request);
+        self.client.post(url).json(&request)
     }
 
     fn url<T>(&self, request: &T) -> String
