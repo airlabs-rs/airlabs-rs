@@ -91,6 +91,33 @@ impl AirportsRequest {
             ..default()
         }
     }
+
+    /// Filter by IATA airport code
+    pub fn iata(self, code: impl ToString) -> Self {
+        let iata_code = Some(code.to_string());
+        Self { iata_code, ..self }
+    }
+
+    /// Filter by ICAO airport code
+    pub fn icao(self, code: impl ToString) -> Self {
+        let icao_code = Some(code.to_string());
+        Self { icao_code, ..self }
+    }
+
+    /// Filter by IATA city code
+    pub fn city(self, city: impl ToString) -> Self {
+        let city_code = Some(city.to_string());
+        Self { city_code, ..self }
+    }
+
+    /// Filter by Country ISO 2 letter code
+    pub fn country(self, country: impl ToString) -> Self {
+        let country_code = Some(country.to_string());
+        Self {
+            country_code,
+            ..self
+        }
+    }
 }
 
 impl AirLabsRequest for AirportsRequest {

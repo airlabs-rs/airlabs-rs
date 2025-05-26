@@ -2,7 +2,11 @@ use super::*;
 
 impl Request {
     pub fn is_free(&self) -> bool {
-        self.key.is_free()
+        self.key().is_free()
+    }
+
+    pub fn key(&self) -> &Key {
+        &self.key
     }
 }
 
