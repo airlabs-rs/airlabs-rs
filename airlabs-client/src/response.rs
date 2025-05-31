@@ -42,23 +42,41 @@ impl Response {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct TypedResponse<T> {
-    response: Response,
-    phantom: PhantomData<T>,
+#[derive(Debug)]
+pub enum ResponseType<T, U> {
+    Regular(T),
+    Free(U),
 }
 
-impl<T> TypedResponse<T>
+#[derive(Clone, Debug)]
+pub struct TypedResponse<R> {
+    response: Response,
+    phantom: PhantomData<R>,
+}
+
+impl<R> TypedResponse<R>
 where
-    T: serde::de::DeserializeOwned,
+    R: api::AirLabsRequest,
+    // T: serde::de::DeserializeOwned,
 {
     pub fn from_response(response: Response) -> Self {
         let phantom = PhantomData;
         Self { response, phantom }
     }
 
-    pub fn response(&self) -> json::Result<api::Response<T>> {
-        self.response.typed()
+    pub fn response(
+        &self,
+    ) -> json::Result<api::Response<ResponseType<R::Response, R::ResponseFree>>> {
+        let response = self.response.json()?;
+        let free = response["request"]["key"]["type"]
+            .as_str()
+            .is_some_and(|text| text == "free");
+        let response = if free {
+            json::from_value::<api::Response<R::ResponseFree>>(response)?.map(ResponseType::Free)
+        } else {
+            json::from_value::<api::Response<R::Response>>(response)?.map(ResponseType::Regular)
+        };
+        Ok(response)
     }
 }
 
