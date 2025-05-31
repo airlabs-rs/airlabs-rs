@@ -38,13 +38,6 @@ pub struct Response<T> {
     pub terms: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum ApiResult<T> {
-    Response(T),
-    Error(Error),
-}
-
 impl<T> Response<T> {
     pub fn into_result(self) -> Result<T, Error> {
         self.result.into_result()
@@ -53,6 +46,24 @@ impl<T> Response<T> {
     pub fn request(&self) -> Option<&Request> {
         self.request.as_ref()
     }
+
+    pub fn map<U, F>(self, op: F) -> Response<U>
+    where
+        F: FnOnce(T) -> U,
+    {
+        Response {
+            request: self.request,
+            result: self.result.map(op),
+            terms: self.terms,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ApiResult<T> {
+    Response(T),
+    Error(Error),
 }
 
 impl<T> ApiResult<T> {
@@ -62,11 +73,21 @@ impl<T> ApiResult<T> {
             Self::Error(error) => Err(error),
         }
     }
+
+    pub fn map<U, F>(self, op: F) -> ApiResult<U>
+    where
+        F: FnOnce(T) -> U,
+    {
+        match self {
+            Self::Response(t) => ApiResult::Response(op(t)),
+            Self::Error(e) => ApiResult::Error(e),
+        }
+    }
 }
 
-pub trait AirLabsRequest: Sized {
-    type Response;
-    type ResponseFree;
+pub trait AirLabsRequest {
+    type Response: serde::de::DeserializeOwned;
+    type ResponseFree: serde::de::DeserializeOwned;
 
     fn url(&self, base: &str) -> String;
 }
