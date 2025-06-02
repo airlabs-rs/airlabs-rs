@@ -35,13 +35,13 @@ impl Command {
             Self::Airline => {
                 let request = client.airlines();
                 let response = client.get(request).await?;
-                self.show_typed(response, params)?;
+                self.show(response, params)?;
             }
 
             Self::Airport => {
                 let request = client.airports();
                 let response = client.get(request).await?;
-                self.show_typed(response, params)?;
+                self.show(response, params)?;
             }
 
             Self::Flight(ref flight) => {
@@ -53,19 +53,19 @@ impl Command {
                     unreachable!()
                 };
                 let response = client.get(request).await?;
-                self.show_typed(response, params)?;
+                self.show(response, params)?;
             }
 
             Self::Ping => {
                 let request = client.ping();
                 let response = client.post(request).await?;
-                self.show_typed(response, params)?;
+                self.show(response, params)?;
             }
         }
         Ok(())
     }
 
-    fn show_typed<R>(&self, response: Response<R>, params: &OutputParams) -> json::Result<()>
+    fn show<R>(&self, response: Response<R>, params: &OutputParams) -> json::Result<()>
     where
         R: api::AirLabsRequest,
         R::Response: Output,
