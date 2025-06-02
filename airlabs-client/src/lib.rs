@@ -1,7 +1,6 @@
 use std::time;
 
 use airlabs_api as api;
-use serde::Serialize;
 use serde_json as json;
 
 pub use error::Error;
@@ -72,7 +71,7 @@ impl Client {
 
     pub async fn get<R>(&self, request: R) -> reqwest::Result<Response<R>>
     where
-        R: api::AirLabsRequest + Serialize,
+        R: api::AirLabsRequest,
     {
         let start = time::Instant::now();
         self.get_request(request)
@@ -86,7 +85,7 @@ impl Client {
 
     pub async fn post<R>(&self, request: R) -> reqwest::Result<Response<R>>
     where
-        R: api::AirLabsRequest + Serialize,
+        R: api::AirLabsRequest,
     {
         let start = time::Instant::now();
         self.post_request(request)
@@ -100,7 +99,7 @@ impl Client {
 
     pub fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
     where
-        R: api::AirLabsRequest + Serialize,
+        R: api::AirLabsRequest,
     {
         let url = self.url(&request);
         self.client.get(url).query(&request)
@@ -108,7 +107,7 @@ impl Client {
 
     fn post_request<R>(&self, request: R) -> reqwest::RequestBuilder
     where
-        R: api::AirLabsRequest + Serialize,
+        R: api::AirLabsRequest,
     {
         let url = self.url(&request);
         self.client.post(url).json(&request)

@@ -56,7 +56,6 @@ version = "0.0.1"
 dependencies = [
  "airlabs-api",
  "reqwest",
- "serde",
  "serde_json",
  "thiserror",
 ]
