@@ -2,11 +2,9 @@ use std::time;
 
 use airlabs_api as api;
 use serde::Serialize;
-use serde::de::DeserializeOwned;
 use serde_json as json;
 
 pub use error::Error;
-pub use response::RawResponse;
 pub use response::Response;
 pub use response::ResponseType;
 
@@ -83,8 +81,7 @@ impl Client {
             .error_for_status()?
             .text()
             .await
-            .map(|raw| RawResponse::new(raw, start.elapsed()))
-            .map(Response::from_raw)
+            .map(|raw| Response::new(raw, start.elapsed()))
     }
 
     pub async fn post<R>(&self, request: R) -> reqwest::Result<Response<R>>
@@ -98,8 +95,7 @@ impl Client {
             .error_for_status()?
             .text()
             .await
-            .map(|raw| RawResponse::new(raw, start.elapsed()))
-            .map(Response::from_raw)
+            .map(|raw| Response::new(raw, start.elapsed()))
     }
 
     pub fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
