@@ -92,10 +92,7 @@ impl AirlinesRequest {
 impl AirLabsRequest for AirlinesRequest {
     type Response = Vec<Airline>;
     type ResponseFree = Vec<AirlineFree>;
-
-    fn url(&self, base: &str) -> String {
-        format!("{base}/airlines")
-    }
+    const METHOD: &'static str = "airlines";
 }
 
 #[cfg(test)]

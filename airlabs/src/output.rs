@@ -43,3 +43,16 @@ impl Output for api::Pong {
         format!("{self:?}")
     }
 }
+
+impl<T, U> Output for ResponseType<T, U>
+where
+    T: Output,
+    U: Output,
+{
+    fn output(&self) -> String {
+        match self {
+            Self::Regular(item) => item.output(),
+            Self::Free(item) => item.output(),
+        }
+    }
+}

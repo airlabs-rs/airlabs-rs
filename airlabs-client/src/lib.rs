@@ -1,11 +1,14 @@
 use std::time;
 
 use airlabs_api as api;
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 use serde_json as json;
 
 pub use error::Error;
+pub use response::RawResponse;
 pub use response::Response;
-pub use response::TypedResponse;
+pub use response::ResponseType;
 
 mod error;
 mod response;
@@ -32,11 +35,8 @@ impl Client {
         }
     }
 
-    pub fn update_from_ping(self, ping: Response) -> json::Result<Self> {
-        let free_account = ping
-            .api_response::<api::Pong>()?
-            .request
-            .is_some_and(|request| request.is_free());
+    pub fn update_from_ping(self, ping: Response<api::PingRequest>) -> json::Result<Self> {
+        let free_account = ping.is_free()?;
         Ok(Self {
             free_account,
             ..self
@@ -47,66 +47,64 @@ impl Client {
         self.free_account
     }
 
-    pub async fn ping(&self) -> reqwest::Result<Response> {
-        let request = api::PingRequest {
-            api_key: self.key.clone(),
-        };
+    pub fn ping(&self) -> api::PingRequest {
+        api::PingRequest::new(&self.key)
+    }
+
+    pub fn airlines(&self) -> api::AirlinesRequest {
+        api::AirlinesRequest::new(&self.key)
+    }
+
+    pub fn airports(&self) -> api::AirportsRequest {
+        api::AirportsRequest::new(&self.key)
+    }
+
+    pub fn flight_iata(&self, code: impl ToString) -> api::FlightRequest {
+        api::FlightRequest::iata(&self.key, code)
+    }
+
+    pub fn flight_icao(&self, code: impl ToString) -> api::FlightRequest {
+        api::FlightRequest::icao(&self.key, code)
+    }
+
+    pub async fn send_ping(&self) -> reqwest::Result<Response<api::PingRequest>> {
+        let request = self.ping();
         self.post(request).await
     }
 
-    pub async fn airlines(&self) -> reqwest::Result<Response> {
-        let request = api::AirlinesRequest::new(&self.key);
-        self.get(request).await
-    }
-
-    pub async fn airports(&self) -> reqwest::Result<Response> {
-        let request = api::AirportsRequest::new(&self.key);
-        self.get(request).await
-    }
-
-    pub async fn flight_iata(&self, code: impl ToString) -> reqwest::Result<Response> {
-        let request = api::FlightRequest::iata(&self.key, code);
-        self.get(request).await
-    }
-
-    pub async fn flight_icao(&self, code: impl ToString) -> reqwest::Result<Response> {
-        let request = api::FlightRequest::icao(&self.key, code);
-        self.get(request).await
-    }
-
-    pub async fn get<R>(&self, request: R) -> reqwest::Result<Response>
+    pub async fn get<R>(&self, request: R) -> reqwest::Result<Response<R>>
     where
-        R: api::AirLabsRequest + serde::Serialize,
+        R: api::AirLabsRequest + Serialize,
     {
         let start = time::Instant::now();
-        let request = self.get_request(request);
-        request
+        self.get_request(request)
             .send()
             .await?
             .error_for_status()?
             .text()
             .await
-            .map(|raw| Response::new(raw, start.elapsed()))
+            .map(|raw| RawResponse::new(raw, start.elapsed()))
+            .map(Response::from_raw)
     }
 
-    async fn post<R>(&self, request: R) -> reqwest::Result<Response>
+    pub async fn post<R>(&self, request: R) -> reqwest::Result<Response<R>>
     where
-        R: api::AirLabsRequest + serde::Serialize,
+        R: api::AirLabsRequest + Serialize,
     {
         let start = time::Instant::now();
-        let request = self.post_request(request);
-        request
+        self.post_request(request)
             .send()
             .await?
             .error_for_status()?
             .text()
             .await
-            .map(|raw| Response::new(raw, start.elapsed()))
+            .map(|raw| RawResponse::new(raw, start.elapsed()))
+            .map(Response::from_raw)
     }
 
-    fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
+    pub fn get_request<R>(&self, request: R) -> reqwest::RequestBuilder
     where
-        R: api::AirLabsRequest + serde::Serialize,
+        R: api::AirLabsRequest + Serialize,
     {
         let url = self.url(&request);
         self.client.get(url).query(&request)
@@ -114,7 +112,7 @@ impl Client {
 
     fn post_request<R>(&self, request: R) -> reqwest::RequestBuilder
     where
-        R: api::AirLabsRequest + serde::Serialize,
+        R: api::AirLabsRequest + Serialize,
     {
         let url = self.url(&request);
         self.client.post(url).json(&request)
