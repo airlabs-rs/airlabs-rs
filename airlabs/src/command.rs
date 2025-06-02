@@ -33,48 +33,43 @@ impl Command {
     pub(super) async fn exec(self, client: &Client, params: &OutputParams) -> anyhow::Result<()> {
         match self {
             Self::Airline => {
-                let response = client.airlines().await?;
-                if client.is_free() {
-                    self.show::<Vec<api::AirlineFree>>(response, params)?;
-                } else {
-                    self.show::<Vec<api::Airline>>(response, params)?;
-                }
+                let request = client.airlines();
+                let response = client.get(request).await?;
+                self.show_typed(response, params)?;
             }
 
             Self::Airport => {
-                let response = client.airports().await?;
-                if client.is_free() {
-                    self.show::<Vec<api::AirportFree>>(response, params)?;
-                } else {
-                    self.show::<Vec<api::Airport>>(response, params)?;
-                }
+                let request = client.airports();
+                let response = client.get(request).await?;
+                self.show_typed(response, params)?;
             }
 
             Self::Flight(ref flight) => {
-                let response = if let Some(code) = flight.iata.as_ref() {
-                    client.flight_iata(code).await?
+                let request = if let Some(code) = flight.iata.as_ref() {
+                    client.flight_iata(code)
                 } else if let Some(code) = flight.icao.as_ref() {
-                    client.flight_icao(code).await?
+                    client.flight_icao(code)
                 } else {
                     unreachable!()
                 };
-                if client.is_free() {
-                    self.show::<api::FlightFree>(response, params)?;
-                } else {
-                    self.show::<api::Flight>(response, params)?;
-                }
+                let response = client.get(request).await?;
+                self.show_typed(response, params)?;
             }
+
             Self::Ping => {
-                let response = client.ping().await?;
-                self.show::<api::Pong>(response, params)?;
+                let request = client.ping();
+                let response = client.post(request).await?;
+                self.show_typed(response, params)?;
             }
         }
         Ok(())
     }
 
-    fn show<T>(&self, response: Response, params: &OutputParams) -> json::Result<()>
+    fn show_typed<R>(&self, response: Response<R>, params: &OutputParams) -> json::Result<()>
     where
-        T: serde::de::DeserializeOwned + Output,
+        R: api::AirLabsRequest,
+        R::Response: Output,
+        R::ResponseFree: Output,
     {
         if params.debug {
             todo!("debug")
@@ -83,7 +78,7 @@ impl Command {
         } else if params.json {
             println!("{}", response.json()?)
         } else {
-            let response = response.api_response::<T>()?;
+            let response = response.api_response()?;
             match response.into_result() {
                 Ok(typed) => println!("{}", typed.output()),
                 Err(err) => println!("{err}"),
@@ -92,7 +87,7 @@ impl Command {
 
         if params.stats {
             let duration = response.duration();
-            let response = response.api_response::<T>()?;
+            let response = response.api_response()?;
             if let Some(request) = response.request {
                 println!("{request:#?}");
             }

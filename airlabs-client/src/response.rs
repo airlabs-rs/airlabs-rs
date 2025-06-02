@@ -4,12 +4,12 @@ use std::time;
 use super::*;
 
 #[derive(Clone, Debug)]
-pub struct Response {
+pub struct RawResponse {
     duration: time::Duration,
     raw: String,
 }
 
-impl Response {
+impl RawResponse {
     pub fn new(raw: impl ToString, duration: time::Duration) -> Self {
         let raw = raw.to_string();
         Self { duration, raw }
@@ -29,14 +29,14 @@ impl Response {
 
     pub fn typed<T>(&self) -> json::Result<T>
     where
-        T: serde::de::DeserializeOwned,
+        T: DeserializeOwned,
     {
         self.json().and_then(json::from_value)
     }
 
     pub fn api_response<T>(&self) -> json::Result<api::Response<T>>
     where
-        T: serde::de::DeserializeOwned,
+        T: DeserializeOwned,
     {
         self.typed()
     }
@@ -49,25 +49,44 @@ pub enum ResponseType<T, U> {
 }
 
 #[derive(Clone, Debug)]
-pub struct TypedResponse<R> {
-    response: Response,
+pub struct Response<R> {
+    raw: RawResponse,
     phantom: PhantomData<R>,
 }
 
-impl<R> TypedResponse<R>
+impl<R> Response<R>
 where
     R: api::AirLabsRequest,
-    // T: serde::de::DeserializeOwned,
 {
-    pub fn from_response(response: Response) -> Self {
+    pub fn from_raw(raw: RawResponse) -> Self {
         let phantom = PhantomData;
-        Self { response, phantom }
+        Self { raw, phantom }
     }
 
-    pub fn response(
+    pub fn duration(&self) -> time::Duration {
+        self.raw.duration()
+    }
+
+    pub fn raw(&self) -> &str {
+        self.raw.raw()
+    }
+
+    pub fn json(&self) -> json::Result<json::Value> {
+        self.raw.json()
+    }
+
+    pub fn is_free(&self) -> json::Result<bool> {
+        let response = self.raw.json()?;
+        let free = response["request"]["key"]["type"]
+            .as_str()
+            .is_some_and(|text| text == "free");
+        Ok(free)
+    }
+
+    pub fn api_response(
         &self,
     ) -> json::Result<api::Response<ResponseType<R::Response, R::ResponseFree>>> {
-        let response = self.response.json()?;
+        let response = self.raw.json()?;
         let free = response["request"]["key"]["type"]
             .as_str()
             .is_some_and(|text| text == "free");

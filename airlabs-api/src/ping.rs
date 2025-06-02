@@ -11,11 +11,15 @@ pub struct PingRequest {
     pub api_key: String,
 }
 
+impl PingRequest {
+    pub fn new(key: &str) -> Self {
+        let api_key = key.into();
+        Self { api_key }
+    }
+}
+
 impl AirLabsRequest for PingRequest {
     type Response = Pong;
     type ResponseFree = Pong;
-
-    fn url(&self, base: &str) -> String {
-        format!("{base}/ping")
-    }
+    const METHOD: &'static str = "ping";
 }

@@ -35,7 +35,6 @@ dependencies = [
  "anyhow",
  "clap",
  "itertools",
- "serde",
  "serde_json",
  "tokio",
 ]

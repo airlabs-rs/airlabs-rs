@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
 pub use airlines::Airline;
 pub use airlines::AirlineFree;
@@ -86,10 +86,13 @@ impl<T> ApiResult<T> {
 }
 
 pub trait AirLabsRequest {
-    type Response: serde::de::DeserializeOwned;
-    type ResponseFree: serde::de::DeserializeOwned;
+    type Response: DeserializeOwned;
+    type ResponseFree: DeserializeOwned;
+    const METHOD: &'static str;
 
-    fn url(&self, base: &str) -> String;
+    fn url(&self, base: &str) -> String {
+        format!("{base}/{}", Self::METHOD)
+    }
 }
 
 fn default<T: Default>() -> T {

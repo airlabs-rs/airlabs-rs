@@ -1,7 +1,7 @@
 use airlabs_api as api;
 use airlabs_client::Client;
-// use airlabs_client::Error;
 use airlabs_client::Response;
+use airlabs_client::ResponseType;
 use clap::Args;
 use clap::Parser;
 use clap::Subcommand;
@@ -31,7 +31,7 @@ impl Cli {
     async fn exec(self) -> anyhow::Result<()> {
         let token = self.token.as_deref().unwrap_or_default();
         let client = Client::new(token);
-        let ping = client.ping().await?;
+        let ping = client.send_ping().await?;
         let client = client.update_from_ping(ping)?;
         self.command.exec(&client, &self.params).await
     }

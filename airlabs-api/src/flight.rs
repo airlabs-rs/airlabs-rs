@@ -326,10 +326,7 @@ pub enum FlightCode {
 impl AirLabsRequest for FlightRequest {
     type Response = Flight;
     type ResponseFree = FlightFree;
-
-    fn url(&self, base: &str) -> String {
-        format!("{base}/flight")
-    }
+    const METHOD: &'static str = "flight";
 }
 
 #[cfg(test)]
