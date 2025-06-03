@@ -4,7 +4,7 @@ members = ["airlabs", "airlabs-api", "airlabs-client"]
 
 
 [workspace.package]
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 repository = "https://github.com/airlabs-rs/airlabs-rs"
 authors = ["Cyril Plisko <cyril.plisko@mountall.com>"]
@@ -24,8 +24,8 @@ thiserror = "2.0"
 time = { version = "0.3", features = ["serde-well-known"] }
 tokio = { version = "1.41", features = ["full"] }
 
-airlabs-api = { version = "0.0.1", path = "./airlabs-api" }
-airlabs-client = { version = "0.0.1", path = "./airlabs-client" }
+airlabs-api = { version = "0.0.2", path = "./airlabs-api" }
+airlabs-client = { version = "0.0.2", path = "./airlabs-client" }
 
 
 [workspace.lints.clippy]
