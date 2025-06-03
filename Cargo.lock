@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "airlabs"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "airlabs-api",
  "airlabs-client",
@@ -41,7 +41,7 @@ dependencies = [
 
 [[package]]
 name = "airlabs-api"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "codes-iso-639",
  "serde",
@@ -52,7 +52,7 @@ dependencies = [
 
 [[package]]
 name = "airlabs-client"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "airlabs-api",
  "reqwest",
