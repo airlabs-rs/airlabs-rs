@@ -18,7 +18,7 @@ pub struct FlightFree {
     /// Aircraft Geo-Longitude for now. Available in the Free plan.
     pub lng: Option<f64>,
     /// Aircraft elevation for now (meters).
-    pub alt: Option<u64>,
+    pub alt: Option<i64>,
     /// Aircraft head direction for now. Available in the Free plan.
     pub dir: Option<f64>,
     /// Aircraft horizontal speed (km) for now.
@@ -96,7 +96,7 @@ pub struct FlightFree {
     /// UNIX timestamp of last aircraft signal.
     pub updated: u64,
     /// Current flight status - scheduled, en-route, landed.
-    pub status: String,
+    pub status: FlightStatus,
     /// Aircraft full model name.
     pub model: Option<String>,
     /// Aircraft manufacturer name. Available in the Free plan.
@@ -294,18 +294,6 @@ pub struct Flight {
     pub percent: Option<u64>,
     /// Response time in UTC timezone
     pub utc: Option<String>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum AircraftType {
-    Adsb,
-    Landplane,
-    Seaplane,
-    Tiltrotor,
-    Helicopter,
-    Gyrocopter,
-    Amphibian,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

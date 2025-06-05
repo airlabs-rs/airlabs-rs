@@ -10,12 +10,16 @@ pub use airlines::AirlinesRequest;
 pub use airports::Airport;
 pub use airports::AirportFree;
 pub use airports::AirportsRequest;
+pub use common::AircraftType;
+pub use common::FlightStatus;
 pub use error::Error;
-pub use flight::AircraftType;
 pub use flight::Flight;
 pub use flight::FlightCode;
 pub use flight::FlightFree;
 pub use flight::FlightRequest;
+pub use flights::BoundingBox;
+pub use flights::Flights;
+pub use flights::FlightsRequest;
 pub use ping::PingRequest;
 pub use ping::Pong;
 pub use request::ClientInfo;
@@ -27,8 +31,10 @@ pub use request::Request;
 
 mod airlines;
 mod airports;
+mod common;
 mod error;
 mod flight;
+mod flights;
 mod ping;
 mod request;
 
