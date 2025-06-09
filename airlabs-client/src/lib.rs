@@ -15,6 +15,7 @@ pub struct Client {
     base: String,
     client: reqwest::Client,
     key: String,
+    id: Option<u64>,
     free_account: bool,
 }
 
@@ -22,20 +23,29 @@ impl Client {
     pub fn new(key: impl ToString) -> Self {
         let base = "https://airlabs.co/api/v9".to_string();
         let key = key.to_string();
+        let id = None;
         let client = reqwest::Client::new();
         let free_account = false;
         Self {
             base,
             client,
             key,
+            id,
             free_account,
         }
     }
 
     pub fn update_from_ping(self, ping: Response<api::PingRequest>) -> json::Result<Self> {
-        let free_account = ping.is_free()?;
+        let response = ping.api_response()?;
+        let (id, free_account) = if let Some(request) = response.request() {
+            let key = request.key();
+            (Some(key.id), key.is_free())
+        } else {
+            (self.id, self.free_account)
+        };
         Ok(Self {
             free_account,
+            id,
             ..self
         })
     }
@@ -97,11 +107,14 @@ impl Client {
     where
         R: api::AirLabsRequest,
     {
+        let signature = self.signature();
+        let auth = if let Some(signature) = signature.as_ref() {
+            &[("signature", signature)]
+        } else {
+            &[("api_key", &self.key)]
+        };
         let url = self.url(&request);
-        self.client
-            .get(url)
-            .query(&[("api_key", &self.key)])
-            .query(&request)
+        self.client.get(url).query(auth).query(&request)
     }
 
     fn post_request<R>(&self, request: R) -> reqwest::RequestBuilder
@@ -117,6 +130,16 @@ impl Client {
         T: api::AirLabsRequest,
     {
         request.url(&self.base)
+    }
+
+    fn signature(&self) -> Option<String> {
+        let api_id = self.id?;
+        let timestamp = time::SystemTime::now()
+            .duration_since(time::SystemTime::UNIX_EPOCH)
+            .ok()?
+            .as_secs();
+        let hash = md5::compute(format!("{timestamp}:{api_key}", api_key = self.key));
+        Some(format!("{api_id}:{timestamp}:{hash:x}"))
     }
 }
 
