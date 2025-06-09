@@ -57,8 +57,6 @@ pub struct Flights {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FlightsRequest {
-    api_key: String,
-
     /// Bounding box (South-West Lat, South-West Long, North-East Lat, North-East Long)
     pub bbox: Option<BoundingBox>,
     /// Map zoom level to reduce the number of flights to speed up rendering (0-11)

@@ -21,7 +21,7 @@ pub struct Request {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Key {
     pub id: u64,
-    pub api_key: String,
+    pub api_key: Option<String>,
     pub r#type: String,
     #[serde(with = "time::serde::rfc3339")]
     pub expired: time::OffsetDateTime,
@@ -54,7 +54,7 @@ pub struct GeoInfo {
     pub country_code: String,
     pub country: String,
     pub continent: String,
-    pub city: String,
+    pub city: Option<String>,
     pub lat: f64,
     pub lng: f64,
     pub timezone: String,
