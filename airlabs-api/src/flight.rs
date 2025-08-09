@@ -298,7 +298,6 @@ pub struct Flight {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FlightRequest {
-    api_key: String,
     #[serde(flatten)]
     pub code: FlightCode,
 }

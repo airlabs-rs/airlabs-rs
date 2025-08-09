@@ -32,14 +32,14 @@ fn ek96_free() {
 
 #[test]
 fn flight_iata() {
-    let req = FlightRequest::iata("secret", "KL1606");
+    let req = FlightRequest::iata("KL1606");
     let req = json::to_string(&req).unwrap();
-    assert_eq!(req, r#"{"api_key":"secret","flight_iata":"KL1606"}"#);
+    assert_eq!(req, r#"{"flight_iata":"KL1606"}"#);
 }
 
 #[test]
 fn flight_icao() {
-    let req = FlightRequest::icao("secret", "KLM1606");
+    let req = FlightRequest::icao("KLM1606");
     let req = json::to_string(&req).unwrap();
-    assert_eq!(req, r#"{"api_key":"secret","flight_icao":"KLM1606"}"#);
+    assert_eq!(req, r#"{"flight_icao":"KLM1606"}"#);
 }
