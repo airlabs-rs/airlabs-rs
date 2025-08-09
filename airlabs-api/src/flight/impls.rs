@@ -1,15 +1,13 @@
 use super::*;
 
 impl FlightRequest {
-    pub fn iata(token: impl ToString, code: impl ToString) -> Self {
-        let api_key = token.to_string();
+    pub fn iata(code: impl ToString) -> Self {
         let code = FlightCode::Iata(code.to_string());
-        Self { api_key, code }
+        Self { code }
     }
 
-    pub fn icao(token: impl ToString, code: impl ToString) -> Self {
-        let api_key = token.to_string();
+    pub fn icao(code: impl ToString) -> Self {
         let code = FlightCode::Icao(code.to_string());
-        Self { api_key, code }
+        Self { code }
     }
 }

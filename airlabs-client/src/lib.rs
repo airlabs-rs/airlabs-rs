@@ -45,19 +45,19 @@ impl Client {
     }
 
     pub fn airlines(&self) -> api::AirlinesRequest {
-        api::AirlinesRequest::new(&self.key)
+        api::AirlinesRequest::new()
     }
 
     pub fn airports(&self) -> api::AirportsRequest {
-        api::AirportsRequest::new(&self.key)
+        api::AirportsRequest::new()
     }
 
     pub fn flight_iata(&self, code: impl ToString) -> api::FlightRequest {
-        api::FlightRequest::iata(&self.key, code)
+        api::FlightRequest::iata(code)
     }
 
     pub fn flight_icao(&self, code: impl ToString) -> api::FlightRequest {
-        api::FlightRequest::icao(&self.key, code)
+        api::FlightRequest::icao(code)
     }
 
     pub async fn ping(&self) -> reqwest::Result<Response<api::PingRequest>> {
@@ -98,7 +98,10 @@ impl Client {
         R: api::AirLabsRequest,
     {
         let url = self.url(&request);
-        self.client.get(url).query(&request)
+        self.client
+            .get(url)
+            .query(&[("api_key", &self.key)])
+            .query(&request)
     }
 
     fn post_request<R>(&self, request: R) -> reqwest::RequestBuilder

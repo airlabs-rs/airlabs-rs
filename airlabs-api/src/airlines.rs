@@ -60,7 +60,6 @@ pub struct Airline {
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct AirlinesRequest {
-    pub api_key: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub iata_code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -80,12 +79,8 @@ pub struct AirlinesRequest {
 }
 
 impl AirlinesRequest {
-    pub fn new(key: &str) -> Self {
-        let api_key = key.into();
-        Self {
-            api_key,
-            ..default()
-        }
+    pub fn new() -> Self {
+        default()
     }
 }
 
