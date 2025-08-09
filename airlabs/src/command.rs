@@ -57,8 +57,7 @@ impl Command {
             }
 
             Self::Ping => {
-                let request = client.ping();
-                let response = client.post(request).await?;
+                let response = client.ping().await?;
                 self.show(response, params)?;
             }
         }

@@ -44,10 +44,6 @@ impl Client {
         self.free_account
     }
 
-    pub fn ping(&self) -> api::PingRequest {
-        api::PingRequest::new(&self.key)
-    }
-
     pub fn airlines(&self) -> api::AirlinesRequest {
         api::AirlinesRequest::new(&self.key)
     }
@@ -64,8 +60,8 @@ impl Client {
         api::FlightRequest::icao(&self.key, code)
     }
 
-    pub async fn send_ping(&self) -> reqwest::Result<Response<api::PingRequest>> {
-        let request = self.ping();
+    pub async fn ping(&self) -> reqwest::Result<Response<api::PingRequest>> {
+        let request = api::PingRequest::new(&self.key);
         self.post(request).await
     }
 
